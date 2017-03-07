@@ -1,1 +1,12 @@
 
+from PIL import Image, ImageDraw, ImageFont
+
+p = r'C:\Users\星灿户外\Desktop\001copy.jpg'
+outfile = r'C:\Users\星灿户外\Desktop\001copy1.jpg'
+font = ImageFont.truetype('C:\Windows\Fonts\Arial.ttf', 100)
+s = Image.open(p)
+c = s.resize((400,400))
+d = ImageDraw.Draw(c)
+d.text((330,-15),'5',font=font, fill = '#f90213')
+#c.save(outfile)
+c.show()
