@@ -1,0 +1,31 @@
+import re, os
+#请求用户输入一个合法的文件路径
+def inp():
+	s = input('Please enter a valid file-path:\n and the output file will be named \'统计结果\' and be created in the same path with your input...')
+	s = os.path.normcase(s)
+	return s
+  
+s = inp()
+
+#检查文件路径的有效性，并创建输出文件
+if not os.path.isfile(s):
+	inp()
+else:
+	out_file = os.path.join(os.path.split(s)[0], '统计结果.txt')
+	
+with open(s, 'r') as b:
+	content = b.read()
+
+char_num = {}
+
+#分解文件内容，的到一个单个单词的list
+char_list = content.split(' ')
+for i in char_list:
+	if i != ' ':
+		i = i.lower()   #全部转为小写		
+    i = re.sub("[\s+\.\/_,\!$%^*()+]", '', i) #去除单词中的符号		
+    char_num[i] = char_num.get(i, 0) + 1 #统计数量
+ 
+ #写入文件   
+with open(out_file, 'a') as b:
+	b.write(str(char_num))
