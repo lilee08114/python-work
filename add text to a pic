@@ -2,11 +2,18 @@
 from PIL import Image, ImageDraw, ImageFont
 
 p = r'C:\Users\星灿户外\Desktop\001copy.jpg'
+#创建输出文件名
 outfile = r'C:\Users\星灿户外\Desktop\001copy1.jpg'
+#设置字体对象
 font = ImageFont.truetype('C:\Windows\Fonts\Arial.ttf', 100)
+#打开图片
 s = Image.open(p)
+#统一图片尺寸
 c = s.resize((400,400))
+#创建Draw对象
 d = ImageDraw.Draw(c)
+#粘贴文字，设置颜色
 d.text((330,-15),'5',font=font, fill = '#f90213')
+#保存图片
 #c.save(outfile)
 c.show()
