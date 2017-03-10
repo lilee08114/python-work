@@ -1,0 +1,21 @@
+import os
+from PIL import Image
+
+k = input('	请输入一个有效的文件夹路径: \n 缩小的图片将在同一文件夹下以原文件名+thumbnail命名')
+k = os.path.normcase(k)
+
+#遍历给定的文件夹，提取图片的名字
+for i in os.walk(k):
+	x, y = i[0], i[2]
+
+for i in y:
+  #组合原始图片的路径
+  orignal_file_path = os.path.join(x, i)
+  #创建调整尺寸后的新文件路径	
+  new_file_name = os.path.splitext(i)[0] +'-thumbnail'+ os.path.splitext(i)[1]
+	new_file_path = os.path.join(x, new_file_name)
+  #打开图片，调整，保存	
+  pics = Image.open(orignal_file_path)
+	i_size = (400, 900)
+	pics.thumbnail(i_size)
+	pics.save(new_file_path)
