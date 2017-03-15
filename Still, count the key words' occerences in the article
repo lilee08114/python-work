@@ -1,0 +1,87 @@
+import re, os 
+''' 
+need a folder path and a key word. 
+this program will base on the given folder path, go through all text file in that folder and return the occerences of the key word
+result will be stored in a jieguo file which was created in the given folder path
+'''
+
+def content_split(file_path):
+	'''
+	open the file through file path, and return file object
+	'''
+	
+	with open(file_path, 'r') as con:
+		content = con.read()
+		
+	word_list = content.split(' ')
+	for i in range(len(word_list)):
+		if word_list[i] != ' ':
+			
+			word_list[i] = re.sub("[\'\"\\\/\*<,>\?=()\+\^\.!\s]",'',word_list[i])
+			
+
+	return word_list
+	
+def words_count(key_word, word_list):
+	'''
+	count the occerences of the key word in the article, return a dict
+	'''
+	
+	#count[key_word] = word_list.count(key_word)
+	return (word_list.count(key_word))
+
+#if os.path.isdir(path):
+def Get_path(path):
+	'''
+	go through the given path, return a list includeing the text file pathes, and False if there is no text file exits
+	'''
+	path_list = []
+	extension = []
+	
+	for i in os.walk(path):
+		b = i
+	for i in b[2]:
+		#print (i) 
+		ext = os.path.splitext(i)[1]
+		extension.append(ext)
+		if os.path.splitext(i)[1] ==  '.txt':
+			file_path = os.path.join(b[0], i)
+			path_list.append(file_path)
+	if '.txt' not in extension:
+		return False
+	return path_list
+	
+def User_enter():
+	'''
+	ask for a valid folder path and a key word.
+	'''
+	path = input('Please enter a valid folder path:')
+	
+	path = os.path.normpath(path)
+	if not os.path.isdir(path):
+		print ('Sorry, invalid path. Please retry!')
+		return User_enter()
+	key_word = input('and please enter the key word you want to count:\n(note: spaces and other special signs will be ignored and only one keyword accepted')
+	return path, key_word
+
+path, key_word = User_enter()
+
+if not Get_path(path):
+	print ('There is no text file in the folder')
+	
+else:	
+	result = {}
+	for i in Get_path(path):
+		p1 = words_count(key_word, content_split(i))
+		#get the article name and send into dict as keys
+		name = os.path.splitext(os.path.split(i)[1])[0]
+		result[name] = p1    
+		print ('name is %s , p1 is %s' %(name, p1))
+	#create result file path and store the result
+	out_path = os.path.join(path, '结果.txt')  
+	with open(out_path, 'a') as c: 
+		c.write(str(result))
+	
+		
+	
+	
