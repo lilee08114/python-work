@@ -1,0 +1,72 @@
+import os, re
+
+def get_path(path):
+	'''
+	get the files' path base on the given folder
+	'''
+	file_list = []
+	s = os.walk(path)
+	for i in s:
+		for j in i[2]:
+			x = os.path.join(i[0], j)
+			file_list.append(x)
+	return file_list
+		
+def open_allfile_by_line(file_list):
+	'''
+	open the file one by one, and return the content line by line 
+	'''
+	for i in file_list:
+		with open(i, 'r', errors = 'ignore') as c:
+			s = c.readlines()
+		for j in s:
+			yield j
+#define a global variable, so it can be used inside the function below		
+global signal			
+signal = False
+
+def is_annotation(content):
+	'''
+	distinguish the annotation, the real code and the empty line,and record them in the dict 
+	'''
+	global signal
+	
+	if re.match("^#", content):
+		count_['注释'] = count_.get('注释',0) + 1
+		
+	elif re.match("^\'\'\'", content):
+		count_['注释'] = count_.get('注释',0) + 1
+		signal = not signal
+	
+	elif signal:
+		count_['注释'] = count_.get('注释',0) + 1
+	
+	elif re.match(".*\'\'\'$", content):
+		count_['注释'] = count_.get('注释',0) + 1
+		signal = not signal
+		
+	elif content.strip() == '':
+		count_['空行'] = count_.get('空行',0) + 1
+		
+	else:
+		count_['正文'] = count_.get('正文',0) + 1
+
+raw_path = input('PLZ enter path...')
+
+# the g below is a generator, fetch the data inside by using next(g)
+g = open_allfile_by_line(get_path(raw_path))
+count_ = {}
+
+#the out_put file path
+out_path = os.path.join(raw_path, 'count.txt')
+while True:
+	try:
+		is_annotation(next(g))
+	except StopIteration:
+		print ('end')
+		break
+with open(out_path, 'a') as b:
+	b.write(str(count_))
+	
+	
+	
