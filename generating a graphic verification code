@@ -1,0 +1,46 @@
+'''
+based on the given size and text, generates a graphic verification code
+''' 
+
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from random import randint
+
+size_width = int(input('width:'))
+size_height = int(input('height:'))
+text = input('verify code(3 characters):')
+
+pic_size = (size_width, size_height)
+
+im = Image.new('RGB', pic_size, None)
+
+dr = ImageDraw.Draw(im)
+
+def random_color():
+	rgb = (randint(0,255),randint(0,255),randint(0,255))
+	return rgb
+
+#change each pixel in the picture into random color
+for i in range(0,size_width):
+	for j in range(0,size_height):
+		dr.point([i,j], fill = random_color())
+		#pix[i, j] = random_color()
+		#return dr
+
+#paste the given text onto the picture 		
+position_1 = (randint(0,6),randint(0,6))
+position_2 = (randint(size_width/3,size_width/3 + 6), randint(0,6))
+position_3 = (randint(size_width*2/3,size_width*2/3 + 6), randint(0,6))
+font = ImageFont.truetype('arial.ttf', 40)	
+dr.text(position_1, text[0], font = font, fill = (255,255,255))
+dr.text(position_2, text[1], font = font, fill = random_color())
+dr.text(position_3, text[2], font = font, fill = random_color())
+	
+#blur the pic, and the scale argument determine how deep? does the blur procession effect
+def filter(im, scale = 3):
+	new = im.filter(ImageFilter.ModeFilter(scale))
+	return new
+
+
+new = filter(im,5)
+#new = filter(im)
+new.show()
