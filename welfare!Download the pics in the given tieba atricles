@@ -1,0 +1,77 @@
+from bs4 import BeautifulSoup
+import urllib.request
+import re, os
+
+'''
+pick the pictures from the tieba atricles! and save it in the 'C:\Users\星灿户外\Desktop\1' path
+'''
+website = input('website:')	
+site = website
+print (site)
+def open_url(site):
+	with urllib.request.urlopen(site) as w:
+		html = w.read()
+	return html
+
+#soup = BeautifulSoup(html,"lxml")
+
+def get_pages_and_replies(site):
+	
+	soup = BeautifulSoup(open_url(site),'lxml')
+	cast = []
+	g = soup.find_all(attrs = {'class':"l_reply_num"})[0].strings
+	for i in g:
+		cast.append(i)
+	pages = int(cast[2])	
+	replies = int(cast[0])
+	title = soup.find_all(attrs = {'class':'core_title_txt'})[0]['title']
+	return pages, replies, title
+
+
+def get_pic_links(site):
+	'''
+	get the respective link of these picture in a single website
+	'''
+	soup = BeautifulSoup(open_url(site),'lxml')
+	pic_links_list = []
+	floor_tags = soup.find_all(id = re.compile("post_content_"))
+	for i in floor_tags:
+		new = BeautifulSoup(str(i),"lxml")
+		for i in new.find_all('img'):
+			if not re.match(".*gsp0.baidu.com", i['src']):
+				pic_links_list.append(i['src'])
+	return pic_links_list
+
+
+#create the output file path
+pages, replies, title = get_pages_and_replies(site)
+outfile = os.path.join(r'C:\Users\星灿户外\Desktop\1', title)
+if not os.path.isdir(outfile):
+	os.makedirs(outfile)	
+
+
+#below is the counte number of pictures	
+global pic_num
+pic_num = 1	
+def save_pic(path_list):
+	'''
+	open links and save 
+	'''
+	global pic_num
+	for i in path_list:
+		pic = urllib.request.urlopen(i).read()
+		pic_name = str(pic_num) + '.jpg'
+		file_name = os.path.join(outfile, pic_name)
+		pic_num += 1
+		with open(file_name, 'wb') as p:
+			p.write(pic)
+			
+
+
+'''
+because get_pic_links(site) function only generates the links list of a single page, so we need keep calling the function untill all pages were gone through
+'''		
+for i in range(pages):
+	new_site = site+'?pn=' + str(i+1)
+	pic_links_list = get_pic_links(new_site)
+	save_pic(pic_links_list)
